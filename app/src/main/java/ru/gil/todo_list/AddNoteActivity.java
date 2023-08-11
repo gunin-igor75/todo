@@ -9,6 +9,8 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 public class AddNoteActivity extends AppCompatActivity {
 
@@ -16,12 +18,23 @@ public class AddNoteActivity extends AppCompatActivity {
     private RadioButton radioButtonLow;
     private RadioButton radioButtonMedium;
     private Button buttonSave;
-    private Database database = Database.getInstance();
+
+    private AddNoteViewModel addNoteViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_note);
+        addNoteViewModel = new ViewModelProvider(this).get(AddNoteViewModel.class);
+        addNoteViewModel.getShouldCloseScreen().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean shouldClose) {
+                if (shouldClose) {
+                    finish();
+                }
+            }
+        });
+
         initViews();
         buttonSave.setOnClickListener(view -> saveNote());
     }
@@ -47,13 +60,10 @@ public class AddNoteActivity extends AppCompatActivity {
             ).show();
         } else {
             int priority = getPriority();
-            int id = database.getNotes().size();
-            Note note = new Note(id, text, priority);
-            database.add(note);
-            finish();
+            Note note = new Note(text, priority);
+            addNoteViewModel.saveNote(note);
         }
     }
-
 
     private int getPriority() {
         if (radioButtonLow.isChecked()) {
