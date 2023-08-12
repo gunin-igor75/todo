@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -19,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerViewNotes;
     private FloatingActionButton buttonAddNote;
+
 
     private NotesAdapter notesAdapter;
 
@@ -81,6 +84,12 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = AddNoteActivity.newIntent(MainActivity.this);
             startActivity(intent);
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        viewModel.refreshList();
     }
 
     private void initViews() {
